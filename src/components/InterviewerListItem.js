@@ -9,7 +9,7 @@ const InterviewerListItem = (props) => {
   })
 
   return (
-    <li onClick={()=>setInterviewer(name)} className={interClass}>
+    <li onClick={setInterviewer} className={interClass}>
       <img
         className="interviewers__item-image"
         src={avatar}
