@@ -14,7 +14,7 @@ const InterviewerList = (props) => {
           <InterviewerListItem
             name={currentInterviewer.name}
             avatar={currentInterviewer.avatar}
-            setInterviewer={()=>setInterviewer(currentInterviewer.id)}
+            setInterviewer={(e)=>setInterviewer(currentInterviewer.id)}
             selected={currentInterviewer.id===interviewer}
             key={currentInterviewer.id}
           />
