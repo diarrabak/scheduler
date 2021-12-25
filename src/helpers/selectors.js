@@ -20,3 +20,14 @@ export const getAppointmentsForDay =(state, day)=>{
 
 
 
+export const getInterview=(state, interview)=>{
+
+  let interviewers=Object.values(state.interviewers);
+  if(interview===null) return null;
+  for (let interviewer of interviewers){
+    if(interviewer.id===interview.interviewer){
+     return {...interview, interviewer}
+    } 
+  }
+}
+

@@ -27,7 +27,7 @@ const Form = (props) => {
             name="name"
             type="text"
             value={name}
-            onChange={() => setName(name)}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Enter Student Name"
           />
         </form>
