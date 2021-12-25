@@ -5,23 +5,32 @@ import { useState, useEffect } from "react";
 import DayList from "./DayList";
 import Appointment from "./appointments/index";
 import axios from "axios";
+import { getAppointmentsForDay } from "helpers/selectors";
 
 export default function Application(props) {
   const [state, setState] = useState({
     day: "Monday",
     days: [],
     appointments: {},
+    interviewers:{}
   });
 
   const setDay = (day) => setState({ ...state, day });
-  const setDays = (days) => setState((prev) => ({ ...prev, days }));
-  const dailyAppointments = [];
+  const dailyAppointments = getAppointmentsForDay(state,state.day);
   useEffect(() => {
-    axios
-      .get("http://localhost:8001/api/days")
-      .then((response) => setDays(response.data));
+    Promise
+      .all([
+        axios.get("http://localhost:8001/api/days"),
+        axios.get("http://localhost:8001/api/appointments"),
+        axios.get("http://localhost:8001/api/interviewers"),
+      ])
+      .then((all) => {
+        const [days, appointments, interviewers] = all;
+      //  console.log(interviewers);
+        setState((prev) => ({ ...prev, days:days.data, appointments:appointments.data, interviewers:interviewers.data }));
+      });
   }, []);
-
+  // console.log(state);
   return (
     <main className="layout">
       <section className="sidebar">
