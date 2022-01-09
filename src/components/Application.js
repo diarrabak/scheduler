@@ -1,36 +1,38 @@
-import React from "react";
+import React, { useState, useEffect }  from "react";
 
 import "components/Application.scss";
-import { useState, useEffect } from "react";
 import DayList from "./DayList";
 import Appointment from "./appointments/index";
-import axios from "axios";
-import { getAppointmentsForDay, getInterview } from "helpers/selectors";
+import axios from "axios";    //Data manipulation API
+import { getAppointmentsForDay, getInterview } from "helpers/selectors";   //List of helper functions
 
-export default function Application(props) {
+export default function Application(props) {    //All the states put in one object calles "state" to make the code more readable
   const [state, setState] = useState({
     day: "Monday",
     days: [],
     appointments: {},
-    interviewers:{}
+    interviewers: {},
   });
 
-  const setDay = (day) => setState({ ...state, day });
-  const dailyAppointments = getAppointmentsForDay(state,state.day);
- 
-  useEffect(() => {
-    Promise
-      .all([
-        axios.get("http://localhost:8001/api/days"),
-        axios.get("http://localhost:8001/api/appointments"),
-        axios.get("http://localhost:8001/api/interviewers"),
-      ])
-      .then((all) => {
-        const [days, appointments, interviewers] = all;
+  const setDay = (day) => setState({ ...state, day });  //To set a particular state( here the day, just use the spread operator)
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
+
+  useEffect(() => {   //This hook render state values based on user defined conditions, here when browser loads
+    Promise.all([
+      axios.get("http://localhost:8001/api/days"),
+      axios.get("http://localhost:8001/api/appointments"),
+      axios.get("http://localhost:8001/api/interviewers"),
+    ]).then((all) => {
+      const [days, appointments, interviewers] = all;
       //  console.log(interviewers);
-        setState((prev) => ({ ...prev, days:days.data, appointments:appointments.data, interviewers:interviewers.data }));
-      });
-  }, []);
+      setState((prev) => ({
+        ...prev,
+        days: days.data,
+        appointments: appointments.data,
+        interviewers: interviewers.data,
+      }));
+    });
+  }, []);   //Empty condtions mean when browser loads the very first time
   // console.log(state);
   return (
     <main className="layout">
@@ -44,7 +46,7 @@ export default function Application(props) {
         />
         <hr className="sidebar__separator sidebar--centered" />
         <nav className="sidebar__menu">
-          <DayList days={state.days} day={state.day} setDay={setDay} />
+          <DayList days={state.days} day={state.day} setDay={setDay} />   {/*List of the week days*/}
         </nav>
         <img
           className="sidebar__lhl sidebar--centered"
@@ -53,9 +55,12 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
-        {dailyAppointments.map((appointment, key) => (
-          <Appointment key={appointment.id} {...appointment} />
-        ))}
+        {dailyAppointments.map((appointment, key) => {   //Updated list of the appointments present in the selected day
+          const interview = getInterview(state, appointment.interview);  //Change the format of interview field--Add interviewer names
+          const tempAppointment = { ...appointment, interview };         //Temporary object to store the updated appointment
+          return <Appointment key={appointment.id} {...tempAppointment} />;
+        })
+        }
       </section>
     </main>
   );
