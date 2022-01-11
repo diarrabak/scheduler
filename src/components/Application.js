@@ -4,7 +4,7 @@ import "components/Application.scss";
 import DayList from "./DayList";
 import Appointment from "./appointments/index";
 import axios from "axios";    //Data manipulation API
-import { getAppointmentsForDay, getInterview } from "helpers/selectors";   //List of helper functions
+import { getAppointmentsForDay, getInterview , getInterviewersForDay} from "helpers/selectors";   //List of helper functions
 
 export default function Application(props) {    //All the states put in one object calles "state" to make the code more readable
   const [state, setState] = useState({
@@ -16,6 +16,7 @@ export default function Application(props) {    //All the states put in one obje
 
   const setDay = (day) => setState({ ...state, day });  //To set a particular state( here the day, just use the spread operator)
   const dailyAppointments = getAppointmentsForDay(state, state.day);
+  const dailyInterviewers = getInterviewersForDay(state, state.day);
 
   useEffect(() => {   //This hook render state values based on user defined conditions, here when browser loads
     Promise.all([
@@ -58,7 +59,7 @@ export default function Application(props) {    //All the states put in one obje
         {dailyAppointments.map((appointment, key) => {   //Updated list of the appointments present in the selected day
           const interview = getInterview(state, appointment.interview);  //Change the format of interview field--Add interviewer names
           const tempAppointment = { ...appointment, interview };         //Temporary object to store the updated appointment
-          return <Appointment key={appointment.id} {...tempAppointment} />;
+          return <Appointment key={appointment.id} {...tempAppointment} interviewers={dailyInterviewers}/>;
         })
         }
       </section>
