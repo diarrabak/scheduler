@@ -33,14 +33,14 @@ const Form = (props) => {
         </form>
         <InterviewerList
           interviewers={interviewers}
-          value={interviewer}
+          interviewer={interviewer}
           setInterviewer={setInterviewer}
         />
       </section>
       <section className="appointment__card-right">
         <section className="appointment__actions">
           <Button onClick={()=>cancel()} danger>Cancel</Button>
-          <Button onClick={onSave} confirm>Save</Button>
+          <Button onClick={()=>onSave(name,interviewer)} confirm>Save</Button>
         </section>
       </section>
     </main>

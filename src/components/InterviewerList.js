@@ -1,10 +1,10 @@
-import React , { useState } from "react";
+import React, { useState } from "react";
 import "./InterviewerList.scss";
 import InterviewerListItem from "./InterviewerListItem";
 const InterviewerList = (props) => {
-  const { interviewers } = props;
+  const { interviewers, interviewer, setInterviewer } = props;
 
- let [interviewer, setInterviewer]=useState(1);
+  //  let [interviewer, setInterviewer]=useState(1);
 
   return (
     <section className="interviewers">
@@ -14,8 +14,8 @@ const InterviewerList = (props) => {
           <InterviewerListItem
             name={currentInterviewer.name}
             avatar={currentInterviewer.avatar}
-            setInterviewer={(e)=>setInterviewer(currentInterviewer.id)}
-            selected={currentInterviewer.id===interviewer}
+            setInterviewer={() => setInterviewer(currentInterviewer.id)}
+            selected={currentInterviewer.id === interviewer}
             key={currentInterviewer.id}
           />
         ))}

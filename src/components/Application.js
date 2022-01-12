@@ -14,6 +14,22 @@ export default function Application(props) {    //All the states put in one obje
     interviewers: {},
   });
 
+  function bookInterview(id, interview) {
+    // console.log(id, interview);
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+
+    console.log(appointment);
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+   
+    setState({ ...state, appointments });  
+  }
+  
   const setDay = (day) => setState({ ...state, day });  //To set a particular state( here the day, just use the spread operator)
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
@@ -59,7 +75,7 @@ export default function Application(props) {    //All the states put in one obje
         {dailyAppointments.map((appointment, key) => {   //Updated list of the appointments present in the selected day
           const interview = getInterview(state, appointment.interview);  //Change the format of interview field--Add interviewer names
           const tempAppointment = { ...appointment, interview };         //Temporary object to store the updated appointment
-          return <Appointment key={appointment.id} {...tempAppointment} interviewers={dailyInterviewers}/>;
+          return <Appointment key={appointment.id} {...tempAppointment} interviewers={dailyInterviewers} bookInterview={bookInterview}/>;
         })
         }
       </section>
