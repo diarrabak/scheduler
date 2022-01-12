@@ -1,12 +1,17 @@
-import React, { useState, useEffect }  from "react";
+import React, { useState, useEffect } from "react";
 
 import "components/Application.scss";
 import DayList from "./DayList";
 import Appointment from "./appointments/index";
-import axios from "axios";    //Data manipulation API
-import { getAppointmentsForDay, getInterview , getInterviewersForDay} from "helpers/selectors";   //List of helper functions
+import axios from "axios"; //Data manipulation API
+import {
+  getAppointmentsForDay,
+  getInterview,
+  getInterviewersForDay,
+} from "helpers/selectors"; //List of helper functions
 
-export default function Application(props) {    //All the states put in one object calles "state" to make the code more readable
+export default function Application(props) {
+  //All the states put in one object calles "state" to make the code more readable
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -16,25 +21,53 @@ export default function Application(props) {    //All the states put in one obje
 
   function bookInterview(id, interview) {
     // console.log(id, interview);
+   
+      const appointment = {
+        ...state.appointments[id],
+        interview: { ...interview },
+      };
+
+      // console.log(appointment);
+      axios
+        .put(`http://localhost:8001/api/appointments/${id}`, { interview })
+        .then(() => {
+          axios.get("http://localhost:8001/api/appointments").then(() => {
+            const appointments = {
+              ...state.appointments,
+              [id]: appointment,
+            };
+            setState({ ...state, appointments });
+          });
+        });
+    
+  }
+
+  function cancelInterview (id) {
     const appointment = {
       ...state.appointments[id],
-      interview: { ...interview }
+      interview: null,
     };
-
     console.log(appointment);
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment
-    };
-   
-    setState({ ...state, appointments });  
+    axios
+    .put(`http://localhost:8001/api/appointments/${id}`, {interview: 'null' })
+    .then(() => {
+      axios.get("http://localhost:8001/api/appointments").then(() => {
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment,
+        };
+        console.log(appointments)
+        setState({ ...state, appointments });
+      });
+    });
   }
-  
-  const setDay = (day) => setState({ ...state, day });  //To set a particular state( here the day, just use the spread operator)
+
+  const setDay = (day) => setState({ ...state, day }); //To set a particular state( here the day, just use the spread operator)
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
 
-  useEffect(() => {   //This hook render state values based on user defined conditions, here when browser loads
+  useEffect(() => {
+    //This hook render state values based on user defined conditions, here when browser loads
     Promise.all([
       axios.get("http://localhost:8001/api/days"),
       axios.get("http://localhost:8001/api/appointments"),
@@ -49,7 +82,7 @@ export default function Application(props) {    //All the states put in one obje
         interviewers: interviewers.data,
       }));
     });
-  }, []);   //Empty condtions mean when browser loads the very first time
+  }, []); //Empty condtions mean when browser loads the very first time
   // console.log(state);
   return (
     <main className="layout">
@@ -63,7 +96,8 @@ export default function Application(props) {    //All the states put in one obje
         />
         <hr className="sidebar__separator sidebar--centered" />
         <nav className="sidebar__menu">
-          <DayList days={state.days} day={state.day} setDay={setDay} />   {/*List of the week days*/}
+          <DayList days={state.days} day={state.day} setDay={setDay} />{" "}
+          {/*List of the week days*/}
         </nav>
         <img
           className="sidebar__lhl sidebar--centered"
@@ -72,12 +106,20 @@ export default function Application(props) {    //All the states put in one obje
         />
       </section>
       <section className="schedule">
-        {dailyAppointments.map((appointment, key) => {   //Updated list of the appointments present in the selected day
-          const interview = getInterview(state, appointment.interview);  //Change the format of interview field--Add interviewer names
-          const tempAppointment = { ...appointment, interview };         //Temporary object to store the updated appointment
-          return <Appointment key={appointment.id} {...tempAppointment} interviewers={dailyInterviewers} bookInterview={bookInterview}/>;
-        })
-        }
+        {dailyAppointments.map((appointment, key) => {
+          //Updated list of the appointments present in the selected day
+          const interview = getInterview(state, appointment.interview); //Change the format of interview field--Add interviewer names
+          const tempAppointment = { ...appointment, interview }; //Temporary object to store the updated appointment
+          return (
+            <Appointment
+              key={appointment.id}
+              {...tempAppointment}
+              interviewers={dailyInterviewers}
+              bookInterview={bookInterview}
+              cancelInterview={cancelInterview}
+            />
+          );
+        })}
       </section>
     </main>
   );
