@@ -49,7 +49,7 @@ export default function Application(props) {
     };
     console.log(appointment);
     axios
-    .put(`http://localhost:8001/api/appointments/${id}`, {interview: 'null' })
+    .put(`http://localhost:8001/api/appointments/${id}`, {interview: null })
     .then(() => {
       axios.get("http://localhost:8001/api/appointments").then(() => {
         const appointments = {
