@@ -1,5 +1,34 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import {useReducer, useState, useEffect } from "react";
+
+
+const SET_DAY = "SET_DAY";
+const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+const SET_INTERVIEW = "SET_INTERVIEW";
+
+function reducer(state, action) {
+  switch (action.type) {
+    case SET_DAY:
+      return { ...state };
+    case SET_APPLICATION_DATA:
+      return {
+          ...state,
+        days: action.days,
+        appointments: action.appointments,
+        interviewers: action.interviewers,
+      }
+    case SET_INTERVIEW: 
+      return{ /* insert logic */
+    }
+    default:
+      throw new Error(
+        `Tried to reduce with unsupported action type: ${action.type}`
+      );
+  }
+}
+
+
+
 const useApplicationData = (initialState) => {
   //All the states put in one object calles "state" to make the code more readable
   const [state, setState] = useState(initialState);
@@ -21,6 +50,17 @@ const useApplicationData = (initialState) => {
         appointments: appointments.data,
         interviewers: interviewers.data,
       }));
+
+      var myWebSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+
+      myWebSocket.onopen = function (event) {
+        myWebSocket.send("Ping!");
+      };
+      myWebSocket.onmessage = function (event) {
+        console.log(event.data);
+      }
+
+
     });
   }, []); //Empty condtions mean when browser loads the very first time
   // console.log(state);
@@ -32,7 +72,7 @@ const useApplicationData = (initialState) => {
       thisDay.appointments.includes(id)
     );  //The day containing the current appointment
     const spots = day[0].spots - 1;  //Decrease the number of spots by 1
-    console.log(spots);
+    // console.log(spots);
     // console.log(appointment);
     axios
       .put(`http://localhost:8001/api/appointments/${id}`, { interview })
@@ -61,7 +101,7 @@ const useApplicationData = (initialState) => {
       thisDay.appointments.includes(id)
     );
     const spots = day[0].spots + 1;  //Increase the number of spots by 1
-    console.log(day[0]);
+    // console.log(day[0]);
 
     axios
       .put(`http://localhost:8001/api/appointments/${id}`, { interview })

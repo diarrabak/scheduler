@@ -1,5 +1,5 @@
 import useVisualMode from "hooks/useVisualMode";
-import React from "react";
+import React, {useEffect} from "react";
 import Confirm from "./Confirm";
 import Empty from "./Empty";
 import Form from "./Form";
@@ -31,6 +31,16 @@ const Appointment = (props) => {
   } = props;
   const { mode, transition, back } = useVisualMode(interview ? SHOW : EMPTY);
 
+  useEffect(() => {
+    if (interview && mode === EMPTY) {
+     transition(SHOW);
+    }
+    if (interview === null && mode === SHOW) {
+     transition(EMPTY);
+    }
+   }, [interview, transition, mode]);
+   
+
   function save(name, interviewer) {
     const interview_ = {
       student: name,
@@ -57,7 +67,7 @@ const Appointment = (props) => {
       {/* Display the empty view when there no interview */}
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
       {/* how the student and the interviewer when there is an interview ans show mode selected */}
-      {mode === SHOW && (
+      {mode === SHOW && interview && (
         <Show
           student={interview.student}
           interviewer={interview.interviewer}
