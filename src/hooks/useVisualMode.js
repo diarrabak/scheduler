@@ -6,10 +6,10 @@ const useVisualMode = (initialMode) => {
 
   const transition = (newMode, replace=false) => {  //This function determines how to set a new mode
     setMode(newMode);
-    setHistory([newMode, ...history]);
+    setHistory(prev=>[...prev, ...history, newMode]);
     console.log(history);
     if(replace){
-        setHistory((prev)=>[...prev, ...history.slice(2, history.length)]);
+        setHistory((prev)=>[...prev, ...history.pop(),newMode]);
     }
   };
   //console.log(history);

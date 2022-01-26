@@ -39,7 +39,7 @@ const Appointment = (props) => {
     transition(SAVING);
     bookInterview(id, interview_)
       .then(() => transition(SHOW))
-      .catch((error) => transition(ERROR_SAVE,true));
+      .catch((error) => transition(ERROR_SAVE, true));
   }
 
   function destroy() {
@@ -53,30 +53,35 @@ const Appointment = (props) => {
   return (
     <article className="appointment">
       <Header time={time} />
+
+      {/* Display the empty view when there no interview */}
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
+      {/* how the student and the interviewer when there is an interview ans show mode selected */}
       {mode === SHOW && (
         <Show
           student={interview.student}
-          interviewer={interview.interviewer.name}
+          interviewer={interview.interviewer}
           onEdit={() => transition(CREATE)}
           onDelete={() => transition(CONFIRM)}
         />
       )}
+      {/* Creation of a new interview when create mode is selected */}
       {mode === CREATE && (
         <Form
           interviewers={interviewers}
+          interview={interview}
           onSave={save}
-          onCancel={() => back(EMPTY)}
+          onCancel={() => back()}
         />
       )}
-
+      {/* When edit mode is selected, display current interview information */}
       {mode === EDIT && (
         <Form
           interview={interview}
           name={interview.student}
           interviewer={interview.interviewer.name}
           onSave={save}
-          onCancel={() => back(SHOW)}
+          onCancel={() => back()}
         />
       )}
 
