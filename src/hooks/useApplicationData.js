@@ -7,7 +7,7 @@ const API_URL="http://localhost:8001/api";  //For actual API
 /*Uncomment for testing*/
 
 // import axios from "__mocks__/axios"; 
-// const API_URL="http://localhost:8000/api";  
+// const API_URL="/api";  
 
 /************** */
 
@@ -15,23 +15,17 @@ const SET_DAY = "SET_DAY";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
 const SET_INTERVIEW = "SET_INTERVIEW";
 
-function reducer(state, action) {
+function reducer(state, action) {   //Sometimes action is used is destructured directly {type, value}
   switch (action.type) {
     case SET_DAY:
-      return { ...state, day: action.day };
+      return { ...state, ...action.value }; //Value is an object value:{day:"current day"}, so spread operator is used
+
     case SET_APPLICATION_DATA:
-      return {
-        ...state,
-        days: action.days,
-        appointments: action.appointments,
-        interviewers: action.interviewers,
-      };
+      return {...state, ...action.value}; //Value contains, days,interviewers and appointments objects
+
     case SET_INTERVIEW:
       return {
-        ...state,
-        days: action.days,
-        appointments: action.appointments,
-      };
+        ...state, ...action.value  };  //Value conatains days and appointments
     default:
       throw new Error(
         `Tried to reduce with unsupported action type: ${action.type}`
@@ -41,9 +35,13 @@ function reducer(state, action) {
 
 const useApplicationData = (initialState) => {
   //All the states put in one object calles "state" to make the code more readable
-  const [state, setState] = useState(initialState);
+  // const [state, setState] = useState(initialState);
+  
+  // const setDay = (day) => setState({ ...state, day }); //To set a particular state( here the day, just use the spread operator)
 
-  const setDay = (day) => setState({ ...state, day }); //To set a particular state( here the day, just use the spread operator)
+  const [state, dispatch] = useReducer(reducer,initialState);
+
+  const setDay = (day) => dispatch({type:SET_DAY, value:{day}});
 
   useEffect(() => {
     //This hook render state values based on user defined conditions, here when browser loads
@@ -55,14 +53,23 @@ const useApplicationData = (initialState) => {
     ]).then((all) => {
       const [days, appointments, interviewers] = all;
       //  console.log(interviewers);
-      setState((prev) => ({
-        ...prev,
+      // setState((prev) => ({
+      //   ...prev,
+      //   days: days.data,
+      //   appointments: appointments.data,
+      //   interviewers: interviewers.data,
+      // }) );
+
+      // console.log(all);
+      dispatch({type:SET_APPLICATION_DATA, value:{
         days: days.data,
         appointments: appointments.data,
         interviewers: interviewers.data,
-      }));
+      }}) ;
 
+// console.log(state);
       /*Commented for testing
+
       var myWebSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
       myWebSocket.onopen = function (event) {
@@ -70,7 +77,9 @@ const useApplicationData = (initialState) => {
       };
       myWebSocket.onmessage = function (event) {
         console.log(event.data);
-      };*/
+      };
+      
+      */
     });
   }, []); //Empty condtions mean when browser loads the very first time
   // console.log(state);
@@ -85,11 +94,16 @@ const useApplicationData = (initialState) => {
           axios.get(`${API_URL}/appointments`),
         ]).then((all) => {
           const [days, appointments] = all;
-          setState((prev) => ({
-            ...prev,
+          // setState((prev) => ({
+          //   ...prev,
+          //   days: days.data,
+          //   appointments: appointments.data,
+          // }));
+          dispatch({type:SET_INTERVIEW, value:{
             days: days.data,
             appointments: appointments.data,
-          }));
+          }}) ;
+
         });
       });
   }
@@ -99,17 +113,23 @@ const useApplicationData = (initialState) => {
       .delete(`${API_URL}/appointments/${id}`, {
         interviewer: null,
       })
+      // .delete(`${API_URL}/appointments`) // For the testing
       .then(() => {
         Promise.all([
           axios.get(`${API_URL}/days`),
           axios.get(`${API_URL}/appointments`),
         ]).then((all) => {
           const [days, appointments] = all;
-          setState((prev) => ({
-            ...prev,
+          // setState((prev) => ({
+          //   ...prev,
+          //   days: days.data,
+          //   appointments: appointments.data,
+          // }));
+          dispatch({type:SET_INTERVIEW, value:{
             days: days.data,
             appointments: appointments.data,
-          }));
+          }}) ;
+
         });
       });
   }
