@@ -1,6 +1,15 @@
-import axios from "axios";
-import {useReducer, useState, useEffect } from "react";
 
+import { useReducer, useState, useEffect } from "react";
+
+import axios from "axios";
+const API_URL="http://localhost:8001/api";  //For actual API
+
+/*Uncomment for testing*/
+
+// import axios from "__mocks__/axios"; 
+// const API_URL="http://localhost:8000/api";  
+
+/************** */
 
 const SET_DAY = "SET_DAY";
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
@@ -9,25 +18,26 @@ const SET_INTERVIEW = "SET_INTERVIEW";
 function reducer(state, action) {
   switch (action.type) {
     case SET_DAY:
-      return { ...state };
+      return { ...state, day: action.day };
     case SET_APPLICATION_DATA:
       return {
-          ...state,
+        ...state,
         days: action.days,
         appointments: action.appointments,
         interviewers: action.interviewers,
-      }
-    case SET_INTERVIEW: 
-      return{ /* insert logic */
-    }
+      };
+    case SET_INTERVIEW:
+      return {
+        ...state,
+        days: action.days,
+        appointments: action.appointments,
+      };
     default:
       throw new Error(
         `Tried to reduce with unsupported action type: ${action.type}`
       );
   }
 }
-
-
 
 const useApplicationData = (initialState) => {
   //All the states put in one object calles "state" to make the code more readable
@@ -38,9 +48,10 @@ const useApplicationData = (initialState) => {
   useEffect(() => {
     //This hook render state values based on user defined conditions, here when browser loads
     Promise.all([
-      axios.get("http://localhost:8001/api/days"),
-      axios.get("http://localhost:8001/api/appointments"),
-      axios.get("http://localhost:8001/api/interviewers"),
+      axios.get(`${API_URL}/days`),
+      axios.get(`${API_URL}/appointments`),
+      axios.get(`${API_URL}/interviewers`),
+
     ]).then((all) => {
       const [days, appointments, interviewers] = all;
       //  console.log(interviewers);
@@ -51,6 +62,7 @@ const useApplicationData = (initialState) => {
         interviewers: interviewers.data,
       }));
 
+      /*Commented for testing
       var myWebSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
       myWebSocket.onopen = function (event) {
@@ -58,69 +70,47 @@ const useApplicationData = (initialState) => {
       };
       myWebSocket.onmessage = function (event) {
         console.log(event.data);
-      }
-
-
+      };*/
     });
   }, []); //Empty condtions mean when browser loads the very first time
   // console.log(state);
 
   function bookInterview(id, interview) {
-    // console.log(id, interview);
-
-    const day = state.days.filter((thisDay) =>
-      thisDay.appointments.includes(id)
-    );  //The day containing the current appointment
-    const spots = day[0].spots - 1;  //Decrease the number of spots by 1
-    // console.log(spots);
-    // console.log(appointment);
-    axios
-      .put(`http://localhost:8001/api/appointments/${id}`, { interview })
+    return axios
+      .put(`${API_URL}/appointments/${id}`, { interview })
+      // .put(`${API_URL}/appointments`)  //For testing
       .then(() => {
-        axios
-          .put(`http://localhost:8001/api/days/${day[0].id}`, { spots }) //update the number of spots of the day
-          .then(() => {
-            Promise.all([
-              axios.get("http://localhost:8001/api/days"),
-              axios.get("http://localhost:8001/api/appointments"),
-            ]).then((all) => {
-              const [days, appointments] = all;
-              setState((prev) => ({
-                ...prev,
-                days: days.data,
-                appointments: appointments.data,
-              }));
-            });
-          });
+        Promise.all([
+          axios.get(`${API_URL}/days`),
+          axios.get(`${API_URL}/appointments`),
+        ]).then((all) => {
+          const [days, appointments] = all;
+          setState((prev) => ({
+            ...prev,
+            days: days.data,
+            appointments: appointments.data,
+          }));
+        });
       });
   }
 
-  function cancelInterview(id, interview = null) {
-    
-    const day = state.days.filter((thisDay) =>
-      thisDay.appointments.includes(id)
-    );
-    const spots = day[0].spots + 1;  //Increase the number of spots by 1
-    // console.log(day[0]);
-
-    axios
-      .put(`http://localhost:8001/api/appointments/${id}`, { interview })
+  function cancelInterview(id) {
+    return axios
+      .delete(`${API_URL}/appointments/${id}`, {
+        interviewer: null,
+      })
       .then(() => {
-        axios
-          .put(`http://localhost:8001/api/days/${day[0].id}`, { spots }) //update the number of spots of the day
-          .then(() => {
-            Promise.all([
-              axios.get("http://localhost:8001/api/days"),
-              axios.get("http://localhost:8001/api/appointments"),
-            ]).then((all) => {
-              const [days, appointments] = all;
-              setState((prev) => ({
-                ...prev,
-                days: days.data,
-                appointments: appointments.data,
-              }));
-            });
-          });
+        Promise.all([
+          axios.get(`${API_URL}/days`),
+          axios.get(`${API_URL}/appointments`),
+        ]).then((all) => {
+          const [days, appointments] = all;
+          setState((prev) => ({
+            ...prev,
+            days: days.data,
+            appointments: appointments.data,
+          }));
+        });
       });
   }
   return { state, setDay, bookInterview, cancelInterview };
