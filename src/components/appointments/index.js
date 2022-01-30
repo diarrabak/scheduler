@@ -26,7 +26,6 @@ const Appointment = (props) => {
     interviewers,
     bookInterview,
     cancelInterview,
-    message,
     id,
   } = props;
 

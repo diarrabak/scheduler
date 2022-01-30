@@ -18,6 +18,7 @@ $appointment-height: 11rem;
       &:hover {
         @include button-active--opacity;
       }
+     
     }
   }
 
@@ -102,10 +103,10 @@ $appointment-height: 11rem;
     }
   }
 
-  &:last-of-type &__add,
-  &:last-of-type &__card {
-    display: block; //none
-  }
+  // &:last-of-type &__add,
+  // &:last-of-type &__card {
+  //   display: block; //none
+  // }
 
   &__actions {
     margin-top: 1rem;
