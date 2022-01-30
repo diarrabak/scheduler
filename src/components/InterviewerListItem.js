@@ -1,6 +1,9 @@
 import "./InterviewerListItem.scss";
 import React from "react";
 import classnames from "classnames";
+
+//Display of a single interviewer on the screen
+
 const InterviewerListItem = (props) => {
   const {name,avatar, selected, setInterviewer}=props;
 

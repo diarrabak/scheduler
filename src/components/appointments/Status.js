@@ -1,5 +1,5 @@
 import React from "react";
-
+//Transition status of an appointment
 const Status = (props) => {
   const { message } = props;
   return (

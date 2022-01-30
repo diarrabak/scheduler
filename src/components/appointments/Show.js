@@ -1,5 +1,5 @@
 import React from "react";
-
+//All information about a complete appointment displayed on the screen
 const Show = (props) => {
     const {student, interviewer,onEdit,onDelete}=props;
   return (

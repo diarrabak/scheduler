@@ -2,11 +2,10 @@ import React from "react";
 import "./InterviewerList.scss";
 import PropTypes from 'prop-types';
 
+//List of all the interviewer from the database
 import InterviewerListItem from "./InterviewerListItem";
 const InterviewerList = (props) => {
   const { interviewers, interviewer, setInterviewer } = props;
-
-  //  let [interviewer, setInterviewer]=useState(1);
 
   return (
     <section className="interviewers">

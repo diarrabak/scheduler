@@ -2,6 +2,7 @@ import React from "react";
 import "./DayListItem.scss";
 import classnames from "classnames";
 
+//Display of single day information
 export default function DayListItem(props) {
   const {name,spots, selected, setDay } = props;
   const formatSpots=(spot)=>{

@@ -1,5 +1,5 @@
 import React from "react";
-
+//Component displayed in case of creation, deletion or edition error of an appointment
 const Error = (props) => {
 
     const {message, onClose}=props;

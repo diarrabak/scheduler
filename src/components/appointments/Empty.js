@@ -1,4 +1,5 @@
 import React from "react";
+//Visual of an empty appointment e.g no interviewer nor interviewee
 const Empty = (props) => {
 
     const {onAdd}=props;

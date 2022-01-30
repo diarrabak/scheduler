@@ -35,6 +35,7 @@ function reducer(state, action) {
   }
 }
 
+//This custom hook allows updating the state of the application
 const useApplicationData = (initialState) => {
   //All the states put in one object calles "state" to make the code more readable
   const [state, dispatch] = useReducer(reducer, initialState);
